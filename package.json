@@ -1,0 +1,11 @@
+{
+  "name": "gobarber",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/Shilton7/gobarber.git",
+  "author": "Shilton <shilton.sistemas@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
