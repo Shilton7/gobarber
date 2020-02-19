@@ -16,6 +16,7 @@ class User extends Model {
       }
     );
 
+    //Hooks
     this.addHook('beforeSave', async user => {
       if (user.password) {
         user.password_hash = await bcrypt.hash(user.password, 8); //campo + força da senha
@@ -23,6 +24,11 @@ class User extends Model {
     });
 
     return this;
+  }
+
+  //Senha Correta
+  checkPassword(password) {
+    return bcrypt.compare(password, this.password_hash);
   }
 }
 
