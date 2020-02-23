@@ -32,4 +32,7 @@ routes.get('/providers', authMiddlewares, ProviderController.index);
 //appointment
 routes.post('/appointments', authMiddlewares, AppointmentController.store);
 
+//appointment user
+routes.get('/appointments', authMiddlewares, AppointmentController.index);
+
 export default routes;

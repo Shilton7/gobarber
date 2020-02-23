@@ -1,9 +1,38 @@
 import * as Yup from 'yup';
 import UserModel from '../models/User';
+import FileModel from '../models/File';
 import AppointmentModel from '../models/Appointment';
 import { startOfHour, parseISO, isBefore } from 'date-fns';
 
 class AppointmentController {
+  async index(req, res) {
+    const appointment = await AppointmentModel.findAll({
+      where: { user_id: req.userId },
+      order: ['date'],
+      attributes: ['id', 'date', 'canceled_at'],
+      include: [
+        {
+          model: UserModel,
+          as: 'provider',
+          attributes: ['id', 'name'],
+          include: [
+            {
+              model: FileModel,
+              as: 'avatar',
+              attributes: ['id', 'path', 'url'],
+            },
+          ],
+        },
+      ],
+    });
+
+    if (!appointment) {
+      return res.json({ message: 'No appointments!' });
+    }
+
+    return res.json(appointment);
+  }
+
   async store(req, res) {
     //Validações
     const schema = Yup.object().shape({
