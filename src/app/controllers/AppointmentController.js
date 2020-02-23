@@ -1,6 +1,7 @@
+import * as Yup from 'yup';
 import UserModel from '../models/User';
 import AppointmentModel from '../models/Appointment';
-import * as Yup from 'yup';
+import { startOfHour, parseISO, isBefore } from 'date-fns';
 
 class AppointmentController {
   async store(req, res) {
@@ -25,8 +26,31 @@ class AppointmentController {
       return res.status(401).json({ error: 'Provider not found!' });
     }
 
+    //Convertendo para hora exata, removendo segundos
+    const horaDateInformed = startOfHour(parseISO(date));
+
+    //Data + hora informada já passou
+    if (isBefore(horaDateInformed, new Date())) {
+      return res.status(400).json({ error: 'Past dates are not permitted.' });
+    }
+
+    //Provider já tem agendamento no horario solictado
+    const checkAvailability = await AppointmentModel.findOne({
+      where: {
+        provider_id,
+        canceled_at: null,
+        date: horaDateInformed,
+      },
+    });
+
+    if (checkAvailability) {
+      return res
+        .status(400)
+        .json({ error: 'Appointment date is not available.' });
+    }
+
     const appointment = await AppointmentModel.create({
-      date, //data agendamento
+      date: horaDateInformed, //data agendamento
       user_id: req.userId, //id do token logado
       provider_id, //prestador
     });
