@@ -5,6 +5,7 @@ import AppointmentModel from '../models/Appointment';
 import { startOfHour, parseISO, isBefore, format, subHours } from 'date-fns';
 import pt from 'date-fns/locale/pt';
 import Notification from '../schemas/Notification';
+import Mail from '../../lib/Mail';
 
 class AppointmentController {
   async index(req, res) {
@@ -109,7 +110,15 @@ class AppointmentController {
   }
 
   async delete(req, res) {
-    const appointment = await AppointmentModel.findByPk(req.params.id);
+    const appointment = await AppointmentModel.findByPk(req.params.id, {
+      include: [
+        {
+          model: UserModel,
+          as: 'provider',
+          attributes: ['name', 'email'],
+        },
+      ],
+    });
 
     if (appointment.user_id != req.userId) {
       return res.status(401).json({
@@ -127,6 +136,13 @@ class AppointmentController {
 
     appointment.canceled_at = new Date();
     await appointment.save();
+
+    //send email
+    await Mail.sendMail({
+      to: `${appointment.provider.name} <${appointment.provider.email}>`,
+      subject: 'Agendamento Cancelado',
+      html: 'Seu agendamento foi cancelado com sucesso.',
+    });
 
     return res.json(appointment);
   }
