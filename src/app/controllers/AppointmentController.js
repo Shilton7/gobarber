@@ -2,7 +2,9 @@ import * as Yup from 'yup';
 import UserModel from '../models/User';
 import FileModel from '../models/File';
 import AppointmentModel from '../models/Appointment';
-import { startOfHour, parseISO, isBefore } from 'date-fns';
+import { startOfHour, parseISO, isBefore, format } from 'date-fns';
+import pt from 'date-fns/locale/pt';
+import Notification from '../schemas/Notification';
 
 class AppointmentController {
   async index(req, res) {
@@ -78,15 +80,29 @@ class AppointmentController {
     });
 
     if (checkAvailability) {
-      return res
-        .status(400)
-        .json({ error: 'Appointment date is not available.' });
+      return res.status(400).json({
+        error: 'Appointment date is not available.',
+      });
     }
 
     const appointment = await AppointmentModel.create({
       date: horaDateInformed, //data agendamento
       user_id: req.userId, //id do token logado
       provider_id, //prestador
+    });
+
+    // Notificar prestador de Serviço
+    const user = await UserModel.findByPk(req.userId); //cliente
+    const formattedDate = format(
+      horaDateInformed,
+      "'dia' dd 'de' MMMM', ás' H:mm'h'",
+      { locale: pt }
+    );
+
+    //Mongodb
+    await Notification.create({
+      content: `Novo Agendamento de ${user.name} para o ${formattedDate}`,
+      user: provider_id,
     });
 
     return res.json(appointment);
