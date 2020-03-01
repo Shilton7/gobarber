@@ -14,13 +14,14 @@ const routes = new Router();
 const upload = multer(multerConfig);
 
 //users
-routes.post('/users', UserController.store);
+routes.get('/users', authMiddlewares, UserController.index);
+routes.post('/users', authMiddlewares, UserController.store);
 routes.put('/users', authMiddlewares, UserController.update);
 
 //session
 routes.post('/sessions', SessionController.store);
 
-//upload
+//upload avatar users and e providers
 routes.post(
   '/files',
   authMiddlewares,
@@ -31,18 +32,16 @@ routes.post(
 //provider
 routes.get('/providers', authMiddlewares, ProviderController.index);
 
-//appointment
-routes.post('/appointments', authMiddlewares, AppointmentController.store);
-
 //appointment user
 routes.get('/appointments', authMiddlewares, AppointmentController.index);
+routes.post('/appointments', authMiddlewares, AppointmentController.store);
 routes.delete(
   '/appointments/:id',
   authMiddlewares,
   AppointmentController.delete
 );
 
-//schedule provider
+//provider agenda/schedule
 routes.get('/schedule', authMiddlewares, ScheduleController.index);
 
 //notification

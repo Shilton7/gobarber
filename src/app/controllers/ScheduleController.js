@@ -28,6 +28,12 @@ class ScheduleController {
       limit: 20, //paginação
       offset: (page - 1) * 20, //paginação
       attributes: ['id', 'date', 'canceled_at', 'user_id'],
+      include: [
+        {
+          model: UserModel,
+          as: 'user',
+        },
+      ],
     });
 
     if (!appointments) {

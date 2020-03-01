@@ -24,10 +24,12 @@ class NotificationController {
     return res.json(notifications);
   }
   async update(req, res) {
+    const { read } = req.query;
+
     //MongoDB
     const notification = await Notification.findByIdAndUpdate(
       req.params.id,
-      { read: true }, //lida
+      { read: read }, //true ou false
       { new: true } //busca o dado atualizado para retornar no json
     );
 

@@ -2,6 +2,14 @@ import UserModel from '../models/User';
 import * as Yup from 'yup';
 
 class UserController {
+  async index(req, res) {
+    const users = await UserModel.findAll({
+      where: {
+        provider: false,
+      },
+    });
+    return res.json(users);
+  }
   async store(req, res) {
     //Validações
     const schema = Yup.object().shape({
