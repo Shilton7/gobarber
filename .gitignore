@@ -4,3 +4,4 @@ anotacoes.txt
 comandos.txt
 yarn-error.log
 yarn.lock
+.env
