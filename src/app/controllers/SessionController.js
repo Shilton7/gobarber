@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
 import * as Yup from 'yup';
 import UserModel from '../models/User';
+import File from '../models/File';
 import authJwtConfig from '../../config/auth_jwt';
 
 class SessionController {
@@ -21,6 +22,13 @@ class SessionController {
 
     const user = await UserModel.findOne({
       where: { email },
+      include: [
+        {
+          model: File,
+          as: 'avatar',
+          attributes: ['id', 'path', 'url'],
+        },
+      ],
     });
 
     //401
@@ -34,10 +42,10 @@ class SessionController {
     }
 
     //gerando token
-    const { id, name } = user;
+    const { id, name, avatar } = user;
 
     return res.json({
-      user: { id, name, email },
+      user: { id, name, email, avatar },
       token: jwt.sign({ id }, authJwtConfig.secret, {
         expiresIn: authJwtConfig.expiresIn,
       }),

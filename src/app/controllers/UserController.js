@@ -1,4 +1,5 @@
 import UserModel from '../models/User';
+import File from '../models/File';
 import * as Yup from 'yup';
 
 class UserController {
@@ -7,6 +8,13 @@ class UserController {
       where: {
         provider: false,
       },
+      include: [
+        {
+          model: File,
+          as: 'avatar',
+          attributes: ['id', 'path', 'url'],
+        },
+      ],
     });
     return res.json(users);
   }
@@ -82,13 +90,26 @@ class UserController {
     }
 
     //Atualizando usuario
-    const { id, name, provider, avatar_id } = await user.update(req.body);
+    await user.update(req.body);
+    const { id, name, provider, avatar } = await UserModel.findByPk(
+      req.userId,
+      {
+        include: [
+          {
+            model: File,
+            as: 'avatar',
+            attributes: ['id', 'path', 'url'],
+          },
+        ],
+      }
+    );
+
     return res.json({
       id,
       name,
       email,
       provider,
-      avatar_id,
+      avatar,
     });
   }
 }

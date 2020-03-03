@@ -32,6 +32,7 @@ class ScheduleController {
         {
           model: UserModel,
           as: 'user',
+          attributes: ['name'],
         },
       ],
     });
