@@ -42,10 +42,10 @@ class SessionController {
     }
 
     //gerando token
-    const { id, name, avatar } = user;
+    const { id, name, provider, avatar } = user;
 
     return res.json({
-      user: { id, name, email, avatar },
+      user: { id, name, email, provider, avatar },
       token: jwt.sign({ id }, authJwtConfig.secret, {
         expiresIn: authJwtConfig.expiresIn,
       }),
